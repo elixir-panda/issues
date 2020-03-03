@@ -9,7 +9,9 @@ defmodule Issues.CLI do
   """
 
   def run(argv) do
-    parse_args(argv)
+    argv
+    |> parse_args()
+    |> process
   end
 
   @doc """
@@ -37,5 +39,20 @@ defmodule Issues.CLI do
 
   def args_to_internal_representation(_) do # bad arg or --help
     :help
+  end
+
+  @doc """
+  Outputs correct command syntax on --help or bad arg
+  or procedes with github call
+  """
+  def process(:help) do
+    IO.puts """
+    usage: issues <user> <project> [ count | #{@default_count} ]
+    """
+    System.halt(0)
+  end
+
+  def process({user, project, _count}) do
+    Issues.GithubIssues.fetch(user, project)
   end
 end
